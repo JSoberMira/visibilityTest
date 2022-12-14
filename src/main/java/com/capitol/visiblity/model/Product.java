@@ -10,4 +10,5 @@ import lombok.ToString;
 public class Product {
     private int id;
     private int sequence;
+
 }

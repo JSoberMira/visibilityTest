@@ -20,36 +20,33 @@ public class LoadFilesService {
 
     private static final String COMMA_DELIMITER = ",";
 
-    public HashMap<Integer, Product> loadProducts() throws FileNotFoundException {
-        HashMap<Integer, Product> products = new HashMap<>();
-        URL resource = getClass().getClassLoader().getResource("product.csv");
+    public List<Product> loadProducts(URL resource) throws FileNotFoundException {
+        List<Product> products = new ArrayList<>();
         try (Scanner scanner = new Scanner(new File(resource.getFile()) ) ) {
             while (scanner.hasNextLine()) {
                 List<String> records = getRecordFromLine(scanner.nextLine());
                 Product product = new Product( converToInt( records.get( 0 ) ), converToInt( records.get( 1 ) ) );
-                products.put( product.getId(), product);
+                products.add( product);
             }
         }
         return products;
     }
 
-    public HashMap<Integer, Size> loadSizes() throws FileNotFoundException {
-        HashMap<Integer, Size> sizes = new HashMap<>();
-        URL resource = getClass().getClassLoader().getResource("size.csv");
+    public List< Size> loadSizes(URL resource) throws FileNotFoundException {
+        List<Size> sizes = new ArrayList<>();
         try (Scanner scanner = new Scanner(new File(resource.getFile()) ) ) {
             while (scanner.hasNextLine()) {
                 List<String> records = getRecordFromLine(scanner.nextLine());
                 Size size = new Size( converToInt( records.get( 0 ) ), converToInt( records.get( 1 ) ),
                         converToBoolean( records.get( 2 ) ), converToBoolean( records.get( 3 ) ) );
-                sizes.put( size.getProductId(), size);
+                sizes.add( size);
             }
         }
         return sizes;
     }
 
-    public HashMap<Integer,Stock> loadStocks() throws FileNotFoundException {
+    public HashMap<Integer,Stock> loadStocks(URL resource) throws FileNotFoundException {
         HashMap<Integer, Stock> stocks = new HashMap<>();
-        URL resource = getClass().getClassLoader().getResource("stock.csv");
         try (Scanner scanner = new Scanner(new File(resource.getFile()) ) ) {
             while (scanner.hasNextLine()) {
                 List<String> records = getRecordFromLine(scanner.nextLine());
@@ -67,21 +64,12 @@ public class LoadFilesService {
         } catch ( Exception e ) {
             log.error( "Error message to {}. Message {} ",value, e.getMessage() );
         }
-        finally {
-            return result;
-        }
+
+        return result;
     }
 
     private boolean converToBoolean(String value) {
-        boolean result = false;
-        try {
-            result = Boolean.parseBoolean( value.trim() );
-        } catch ( Exception e ) {
-            log.error( "Error message to {}. Message {} ",value, e.getMessage() );
-        }
-        finally {
-            return result;
-        }
+        return Boolean.parseBoolean( value.trim() );
     }
 
     private List<String> getRecordFromLine(String line) {
