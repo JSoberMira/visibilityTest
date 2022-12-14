@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -23,7 +22,7 @@ public class VisibilityCheckService {
             }
 
         } );
-        return finalProducts.stream().map(Product::getId).collect( Collectors.toList()).toString();
+        return finalProducts.stream().map(Product::getId).toList().toString();
     }
 
     private boolean isVisibilityProduct(final Product product, final List<Size> sizes, final HashMap<Integer, Stock> stocks) {
@@ -31,10 +30,10 @@ public class VisibilityCheckService {
         AtomicBoolean haveSpecialWithStock = new AtomicBoolean( false );
         AtomicBoolean haveNotSpecialWithStock = new AtomicBoolean( false );
         List<Size> sizesProduct = sizes.stream()
-                .filter( size -> size.getProductId() == product.getId() ).collect( Collectors.toList());
+                .filter( size -> size.getProductId() == product.getId() ).toList();
         sizesProduct.stream().forEach( size -> {
             if (stocks.containsKey( size.getId() ) ) {
-                if (isException( size, stocks ) || isBackSoon( size ) ) {
+                if (isNotSpecialWithStock( size, stocks ) || isBackSoon( size ) ) {
                     show.set( true );
                 }
                 haveSpecialWithStock.set( isSpecialWithStock( size, stocks ) );
@@ -48,11 +47,6 @@ public class VisibilityCheckService {
         return show.get();
     }
 
-    private boolean isNotSpecialWithStock(final Size size, final HashMap<Integer, Stock> stocks) {
-        final Stock stock = stocks.get( size.getId() );
-        return stock.getQuantity()>0 && !size.isSpecial();
-    }
-
     private boolean isSpecialWithStock(final Size size, final HashMap<Integer, Stock> stocks) {
         final Stock stock = stocks.get( size.getId() );
         return stock.getQuantity()>0 && size.isSpecial();
@@ -62,7 +56,7 @@ public class VisibilityCheckService {
         return size.isBackSoon() && !size.isSpecial();
     }
 
-    private boolean isException(final Size size, final HashMap<Integer, Stock> stocks) {
+    private boolean isNotSpecialWithStock(final Size size, final HashMap<Integer, Stock> stocks) {
         final Stock stock = stocks.get( size.getId() );
         return stock.getQuantity()>0 && !size.isSpecial();
     }
